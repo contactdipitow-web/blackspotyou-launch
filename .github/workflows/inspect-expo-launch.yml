@@ -13,39 +13,18 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - name: Inspect published Launch packages and browser bundle
+      - name: Inspect Launch browser error handling
         shell: bash
         run: |
           set -euo pipefail
           mkdir inspect && cd inspect
-          pattern='Unknown custom build error|custom build error|eas\.json|projectId|custom build'
 
-          echo '=== npm metadata ==='
-          npm view create-launch@latest version dist.tarball repository --json || true
-          npm view @expo/launching@latest version dist.tarball repository --json || true
-
-          for package in create-launch@latest @expo/launching@latest; do
-            echo "=== $package files ==="
-            tarball="$(npm pack "$package" --silent 2>/dev/null || true)"
-            if [ -z "$tarball" ]; then
-              echo "Package unavailable"
-              continue
-            fi
-            dir="$(echo "$package" | tr '/@' '__')"
-            mkdir -p "$dir"
-            tar -xzf "$tarball" -C "$dir"
-            find "$dir/package" -maxdepth 4 -type f -print | sort | head -n 200
-            echo "=== $package matches ==="
-            grep -RniE "$pattern" "$dir/package" | head -n 300 || true
-          done
-
-          echo '=== launch.expo.dev browser assets ==='
           mkdir -p site
           curl -fsSL https://launch.expo.dev/ -o site/index.html
           grep -oE '(src|href)="[^"]+\.(js|mjs)(\?[^"]*)?"' site/index.html \
             | sed -E 's/^(src|href)="//; s/"$//' \
             | sort -u > site/assets.txt || true
-          cat site/assets.txt
+
           while IFS= read -r asset; do
             [ -n "$asset" ] || continue
             case "$asset" in
@@ -57,5 +36,10 @@ jobs:
             curl -fsSL "$url" -o "$file" || true
           done < site/assets.txt
 
-          echo '=== browser bundle matches ==='
-          grep -RniE "$pattern" site | head -n 500 || true
+          echo '=== exact user-facing error ==='
+          grep -RniF -C 3 'Unknown custom build error' site || true
+          grep -RniF -C 3 'See logs for more information' site || true
+
+          echo '=== related status/error tokens ==='
+          grep -RniE -C 2 'CUSTOM_BUILD|customBuild|custom-build|custom build|workflowStatus|dashboardUrl|build logs' site \
+            | head -n 1200 || true
