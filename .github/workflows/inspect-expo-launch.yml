@@ -1,0 +1,36 @@
+name: Inspect Expo Launch diagnostics
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Inspect published Launch packages
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir inspect && cd inspect
+          echo '=== npm metadata ==='
+          npm view create-launch@latest version dist.tarball repository --json || true
+          npm view @expo/launching@latest version dist.tarball repository --json || true
+
+          for package in create-launch@latest @expo/launching@latest; do
+            echo "=== $package ==="
+            tarball="$(npm pack "$package" --silent 2>/dev/null || true)"
+            if [ -z "$tarball" ]; then
+              echo "Package unavailable"
+              continue
+            fi
+            dir="$(echo "$package" | tr '/@' '__')"
+            mkdir -p "$dir"
+            tar -xzf "$tarball" -C "$dir"
+            grep -RniE 'Unknown custom build error|custom build error|eas\.json|projectId|custom build' "$dir/package" --exclude='*.map' | head -n 300 || true
+          done
