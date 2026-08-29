@@ -1,0 +1,3 @@
+export type AppRole = 'member' | 'moderator' | 'admin';
+export type Category = { id: number; slug: string; label: string; icon_name: string | null };
+export type Establishment = { id: string; name: string; slug: string; description: string | null; address_line: string | null; postal_code: string | null; city: string; country_code: string; latitude: number; longitude: number; google_place_id?: string | null; cover_image_path: string | null; website_url: string | null; phone: string | null; public_status: 'unclassified'|'good_spot'|'watchlist'|'red_flag'|'community_recommended'|'under_review'|'incident_documented'; ownership_context: string; community_context: string | null; created_at: string; establishment_categories: Pick<Category,'label'|'slug'> | null };
