@@ -1,0 +1,6 @@
+import { Link } from 'expo-router';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
+import type { Establishment } from '@/types';
+import { colors, radius } from '@/theme';
+export function PlaceCard({ place }: { place: Establishment }) { return <Link href={{pathname:'/place/[slug]',params:{slug:place.slug}}} asChild><Pressable accessibilityRole="button" accessibilityLabel={`Voir ${place.name}`} style={s.card}><View style={s.badge}><Text style={s.badgeText}>{place.establishment_categories?.label ?? 'Lieu'}</Text></View><Text style={s.name}>{place.name}</Text><Text style={s.city}>{[place.address_line,place.city].filter(Boolean).join(' · ')}</Text><Text numberOfLines={2} style={s.desc}>{place.description ?? place.community_context ?? 'Découvrez les informations vérifiées par la communauté.'}</Text></Pressable></Link> }
+const s=StyleSheet.create({card:{backgroundColor:colors.white,borderRadius:radius.lg,padding:18,marginVertical:7,borderWidth:1,borderColor:colors.border,gap:7},badge:{alignSelf:'flex-start',backgroundColor:colors.lilac,borderRadius:99,paddingVertical:5,paddingHorizontal:10},badgeText:{color:colors.purpleDark,fontWeight:'700',fontSize:12},name:{fontSize:20,fontWeight:'800',color:colors.ink},city:{color:colors.muted,fontWeight:'600'},desc:{color:colors.muted,lineHeight:20}});
