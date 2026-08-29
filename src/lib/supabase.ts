@@ -2,9 +2,8 @@ import 'react-native-url-polyfill/auto';
 import { createClient } from '@supabase/supabase-js';
 import * as SecureStore from 'expo-secure-store';
 
-const url = process.env.EXPO_PUBLIC_SUPABASE_URL;
-const key = process.env.EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
-if (!url || !key) console.warn('Configuration Supabase manquante. Copiez .env.example vers .env.');
+const url = process.env.EXPO_PUBLIC_SUPABASE_URL ?? 'https://zyreqzldpfmdjvazkqvn.supabase.co';
+const key = process.env.EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY ?? 'sb_publishable_v3OZAz3x64nuCCsHuSBCHQ_nimguGro';
 
 const chunkCountKey = (keyName: string) => `${keyName}.chunks`;
 const chunkItemKey = (keyName: string, index: number) => `${keyName}.part.${index}`;
@@ -29,11 +28,13 @@ const secureSessionStorage = {
   },
 };
 
-export const supabase = createClient(url ?? 'https://invalid.local', key ?? 'missing', {
+export const supabase = createClient(url, key, {
   auth: {
     storage: secureSessionStorage,
     flowType: 'pkce',
-    autoRefreshToken: true, persistSession: true, detectSessionInUrl: false,
+    autoRefreshToken: true,
+    persistSession: true,
+    detectSessionInUrl: false,
   },
   global: { headers: { 'X-Client-Info': 'blackspot-you-mobile/1.0.0' } },
 });
