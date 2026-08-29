@@ -13,33 +13,24 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - name: Inspect Launch browser error handling
+      - name: Query recent EAS builds for BLACKSPOT YOU
         shell: bash
         run: |
           set -euo pipefail
-          mkdir inspect && cd inspect
+          cat > payload.json <<'JSON'
+          {
+            "query": "query ViewBuildsOnApp($appId: String!, $offset: Int!, $limit: Int!) { app { byId(appId: $appId) { id name slug ownerAccount { name } builds(offset: $offset, limit: $limit) { id status platform buildProfile appIdentifier sdkVersion appVersion appBuildVersion gitCommitHash gitCommitMessage message createdAt updatedAt completedAt error { errorCode message docsUrl } artifacts { buildUrl xcodeBuildLogsUrl buildArtifactsUrl applicationArchiveUrl } logFiles } } } }",
+            "variables": {
+              "appId": "fbd1b684-c8fe-49be-adfa-790e87d521e3",
+              "offset": 0,
+              "limit": 20
+            }
+          }
+          JSON
 
-          mkdir -p site
-          curl -fsSL https://launch.expo.dev/ -o site/index.html
-          grep -oE '(src|href)="[^"]+\.(js|mjs)(\?[^"]*)?"' site/index.html \
-            | sed -E 's/^(src|href)="//; s/"$//' \
-            | sort -u > site/assets.txt || true
-
-          while IFS= read -r asset; do
-            [ -n "$asset" ] || continue
-            case "$asset" in
-              http*) url="$asset" ;;
-              /*) url="https://launch.expo.dev$asset" ;;
-              *) url="https://launch.expo.dev/$asset" ;;
-            esac
-            file="site/$(echo "$asset" | sed 's#[/?&=]#_#g')"
-            curl -fsSL "$url" -o "$file" || true
-          done < site/assets.txt
-
-          echo '=== exact user-facing error ==='
-          grep -RniF -C 3 'Unknown custom build error' site || true
-          grep -RniF -C 3 'See logs for more information' site || true
-
-          echo '=== related status/error tokens ==='
-          grep -RniE -C 2 'CUSTOM_BUILD|customBuild|custom-build|custom build|workflowStatus|dashboardUrl|build logs' site \
-            | head -n 1200 || true
+          http_code="$(curl -sS -o response.json -w '%{http_code}' \
+            -H 'Content-Type: application/json' \
+            --data-binary @payload.json \
+            https://api.expo.dev/graphql)"
+          echo "HTTP $http_code"
+          python3 -m json.tool response.json || cat response.json
