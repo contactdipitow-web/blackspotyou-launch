@@ -13,17 +13,19 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - name: Inspect published Launch packages
+      - name: Inspect published Launch packages and browser bundle
         shell: bash
         run: |
           set -euo pipefail
           mkdir inspect && cd inspect
+          pattern='Unknown custom build error|custom build error|eas\.json|projectId|custom build'
+
           echo '=== npm metadata ==='
           npm view create-launch@latest version dist.tarball repository --json || true
           npm view @expo/launching@latest version dist.tarball repository --json || true
 
           for package in create-launch@latest @expo/launching@latest; do
-            echo "=== $package ==="
+            echo "=== $package files ==="
             tarball="$(npm pack "$package" --silent 2>/dev/null || true)"
             if [ -z "$tarball" ]; then
               echo "Package unavailable"
@@ -32,5 +34,28 @@ jobs:
             dir="$(echo "$package" | tr '/@' '__')"
             mkdir -p "$dir"
             tar -xzf "$tarball" -C "$dir"
-            grep -RniE 'Unknown custom build error|custom build error|eas\.json|projectId|custom build' "$dir/package" --exclude='*.map' | head -n 300 || true
+            find "$dir/package" -maxdepth 4 -type f -print | sort | head -n 200
+            echo "=== $package matches ==="
+            grep -RniE "$pattern" "$dir/package" | head -n 300 || true
           done
+
+          echo '=== launch.expo.dev browser assets ==='
+          mkdir -p site
+          curl -fsSL https://launch.expo.dev/ -o site/index.html
+          grep -oE '(src|href)="[^"]+\.(js|mjs)(\?[^"]*)?"' site/index.html \
+            | sed -E 's/^(src|href)="//; s/"$//' \
+            | sort -u > site/assets.txt || true
+          cat site/assets.txt
+          while IFS= read -r asset; do
+            [ -n "$asset" ] || continue
+            case "$asset" in
+              http*) url="$asset" ;;
+              /*) url="https://launch.expo.dev$asset" ;;
+              *) url="https://launch.expo.dev/$asset" ;;
+            esac
+            file="site/$(echo "$asset" | sed 's#[/?&=]#_#g')"
+            curl -fsSL "$url" -o "$file" || true
+          done < site/assets.txt
+
+          echo '=== browser bundle matches ==='
+          grep -RniE "$pattern" site | head -n 500 || true
