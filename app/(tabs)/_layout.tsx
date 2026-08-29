@@ -1,0 +1,3 @@
+import { Tabs } from 'expo-router'; import { Text } from 'react-native'; import { colors } from '@/theme';
+const Icon=({v}:{v:string})=><Text style={{fontSize:20}}>{v}</Text>;
+export default function TabsLayout(){return <Tabs screenOptions={{headerShown:false,tabBarActiveTintColor:colors.purple,tabBarInactiveTintColor:colors.muted,tabBarStyle:{height:82,paddingTop:8}}}><Tabs.Screen name="index" options={{title:'Accueil',tabBarIcon:()=> <Icon v="⌂"/>}}/><Tabs.Screen name="explore" options={{title:'Explorer',tabBarIcon:()=> <Icon v="⌕"/>}}/><Tabs.Screen name="map" options={{title:'Carte',tabBarIcon:()=> <Icon v="⌖"/>}}/><Tabs.Screen name="profile" options={{title:'Profil',tabBarIcon:()=> <Icon v="●"/>}}/></Tabs>}
