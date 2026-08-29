@@ -1,0 +1,29 @@
+{
+  "cli": {
+    "version": ">= 16.18.0",
+    "appVersionSource": "remote"
+  },
+  "build": {
+    "production": {
+      "distribution": "store",
+      "environment": "production",
+      "credentialsSource": "remote",
+      "resourceClass": "medium",
+      "autoIncrement": true,
+      "channel": "production",
+      "env": {
+        "EXPO_PUBLIC_SUPABASE_URL": "https://zyreqzldpfmdjvazkqvn.supabase.co",
+        "EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY": "sb_publishable_v3OZAz3x64nuCCsHuSBCHQ_nimguGro",
+        "EXPO_PUBLIC_WEB_URL": "https://blackspotyou.com",
+        "BLACKSPOT_APPLICATION_ID": "com.blackspotyou.app",
+        "EXPO_PUBLIC_EAS_PROJECT_ID": "fbd1b684-c8fe-49be-adfa-790e87d521e3"
+      },
+      "ios": {
+        "image": "sdk-57"
+      }
+    }
+  },
+  "submit": {
+    "production": {}
+  }
+}
