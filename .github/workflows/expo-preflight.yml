@@ -1,4 +1,4 @@
-name: Expo Launch preflight
+name: Expo repository preflight
 
 on:
   push:
@@ -20,9 +20,22 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 22
+          cache: npm
+          cache-dependency-path: package-lock.json
 
       - name: Install dependencies
-        run: npm install --no-audit --no-fund
+        run: npm ci --no-audit --no-fund
 
-      - name: Validate Expo config, dependencies, TypeScript and iOS prebuild
-        run: npm run preflight:ios
+      - name: Show resolved native versions
+        run: |
+          node -e "for (const p of ['expo','expo-modules-core','react-native','react-native-worklets','react-native-reanimated','expo-router','react-native-screens']) { try { console.log(p, require(p + '/package.json').version) } catch (e) { console.log(p, 'NOT_INSTALLED') } }"
+          npm ls expo expo-modules-core react-native react-native-worklets react-native-reanimated expo-router react-native-screens || true
+
+      - name: Expo Doctor
+        run: npx expo-doctor
+
+      - name: TypeScript
+        run: npm run typecheck
+
+      - name: Generate native iOS project
+        run: npx expo prebuild --platform ios --clean --no-install
