@@ -16,11 +16,11 @@ jobs:
           cache: npm
       - name: Install project dependencies
         run: npm ci --no-audit --no-fund
-      - name: Link BLACKSPOT YOU to App Store Connect
+      - name: Inspect current TestFlight workflow
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
-        run: npx --yes eas-cli@latest integrations:asc:connect --api-key-id KFVDVXHWU2 --asc-app-id 6806782781 --bundle-id com.blackspotyou.app --json --non-interactive
-      - name: Confirm App Store Connect integration
+        run: npx --yes eas-cli@latest workflow:view 01a05401-7045-7ba8-9906-205b4a1c769b --json --non-interactive
+      - name: Read current TestFlight upload logs
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
-        run: npx --yes eas-cli@latest integrations:asc:status --json --non-interactive
+        run: npx --yes eas-cli@latest workflow:logs 01a05401-7236-7dbf-baf9-8f94c6a111ce --json --non-interactive --all-steps
