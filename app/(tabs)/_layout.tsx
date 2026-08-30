@@ -2,7 +2,7 @@ import { Tabs } from 'expo-router';
 import { StyleSheet,Text,View } from 'react-native';
 import { colors } from '@/theme';
 function Icon({glyph,focused}:{glyph:string;focused:boolean}){return <View style={[s.icon,focused&&s.iconOn]}><Text style={[s.glyph,focused&&s.glyphOn]}>{glyph}</Text></View>}
-export default function TabsLayout(){return <Tabs screenOptions={{headerShown:false,tabBarActiveTintColor:colors.purple,tabBarInactiveTintColor:colors.muted,tabBarLabelStyle:{fontSize:10.5,fontWeight:'750',paddingBottom:5},tabBarStyle:{height:86,paddingTop:7,borderTopColor:colors.border,backgroundColor:colors.white}}}>
+export default function TabsLayout(){return <Tabs screenOptions={{headerShown:false,tabBarActiveTintColor:colors.purple,tabBarInactiveTintColor:colors.muted,tabBarLabelStyle:{fontSize:10.5,fontWeight:'700',paddingBottom:5},tabBarStyle:{height:86,paddingTop:7,borderTopColor:colors.border,backgroundColor:colors.white}}}>
   <Tabs.Screen name="index" options={{title:'Accueil',tabBarIcon:({focused})=><Icon glyph="⌂" focused={focused}/>}}/>
   <Tabs.Screen name="explore" options={{title:'Explorer',tabBarIcon:({focused})=><Icon glyph="⌕" focused={focused}/>}}/>
   <Tabs.Screen name="spotlight" options={{title:'À la une',tabBarIcon:({focused})=><Icon glyph="✦" focused={focused}/>}}/>
