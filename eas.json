@@ -26,5 +26,14 @@
         "buildType": "app-bundle"
       }
     }
+  },
+  "submit": {
+    "production": {
+      "ios": {
+        "ascAppId": "6806782781",
+        "appleTeamId": "M3BQY9VGY2",
+        "bundleIdentifier": "com.blackspotyou.app"
+      }
+    }
   }
 }
