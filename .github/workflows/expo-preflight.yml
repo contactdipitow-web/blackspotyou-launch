@@ -27,6 +27,26 @@ jobs:
       - name: Install locked dependencies
         run: npm ci --no-audit --no-fund
 
+      - name: Validate Expo Launch production profile
+        run: |
+          node <<'NODE'
+          const config = require('./eas.json');
+          const production = config?.build?.production;
+          if (!production || Object.keys(production).length === 0) {
+            throw new Error('eas.json build.production must be explicit and non-empty for Expo Launch');
+          }
+          if (production.distribution !== 'store') {
+            throw new Error('eas.json build.production.distribution must be "store"');
+          }
+          if (production.environment !== 'production') {
+            throw new Error('eas.json build.production.environment must be "production"');
+          }
+          if (!production.ios || typeof production.ios !== 'object') {
+            throw new Error('eas.json build.production.ios must be explicitly configured');
+          }
+          console.log('Expo Launch production profile is explicit and valid.');
+          NODE
+
       - name: Resolve Expo config
         run: npx expo config --type public >/dev/null
 
