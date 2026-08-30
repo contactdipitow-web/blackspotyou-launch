@@ -18,9 +18,11 @@
       "environment": "production",
       "autoIncrement": true,
       "ios": {
+        "image": "latest",
         "resourceClass": "m-medium"
       },
       "android": {
+        "image": "latest",
         "buildType": "app-bundle"
       }
     }
