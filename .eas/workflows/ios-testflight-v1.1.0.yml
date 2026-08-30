@@ -1,0 +1,22 @@
+name: BLACKSPOT YOU iOS TestFlight
+
+on:
+  push:
+    branches:
+      - eas/ios-testflight-v1.1.0
+
+jobs:
+  testflight:
+    name: Upload BLACKSPOT YOU 1.1.0 (7) to TestFlight
+    type: testflight
+    params:
+      build_id: 92b67a82-aab2-4cbf-b611-f04e689b4045
+      profile: production
+      changelog: |
+        BLACKSPOT YOU 1.1.0
+        - Nouvelle expérience mobile et identité visuelle
+        - Explorer multi-catégories
+        - Carte et lieux à proximité
+        - À la une
+        - B-coins
+        - Administration et modération natives
