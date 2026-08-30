@@ -1,5 +1,28 @@
 {
+  "cli": {
+    "version": ">= 16.0.1",
+    "appVersionSource": "remote"
+  },
   "build": {
-    "production": {}
+    "development": {
+      "developmentClient": true,
+      "distribution": "internal",
+      "environment": "development"
+    },
+    "preview": {
+      "distribution": "internal",
+      "environment": "preview"
+    },
+    "production": {
+      "distribution": "store",
+      "environment": "production",
+      "autoIncrement": true,
+      "ios": {
+        "resourceClass": "m-medium"
+      },
+      "android": {
+        "buildType": "app-bundle"
+      }
+    }
   }
 }
