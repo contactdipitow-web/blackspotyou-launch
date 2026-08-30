@@ -6,27 +6,33 @@
     "version": "1.0.0",
     "orientation": "portrait",
     "scheme": "blackspotyou",
-    "userInterfaceStyle": "automatic",
     "ios": {
       "bundleIdentifier": "com.blackspotyou.app",
       "buildNumber": "1",
       "supportsTablet": false,
       "infoPlist": {
-        "NSLocationWhenInUseUsageDescription": "BLACKSPOT YOU utilise votre position uniquement pour afficher les lieux à proximité.",
         "ITSAppUsesNonExemptEncryption": false
       }
     },
     "android": {
-      "package": "com.blackspotyou.app",
-      "permissions": ["ACCESS_COARSE_LOCATION", "ACCESS_FINE_LOCATION"]
+      "package": "com.blackspotyou.app"
     },
     "plugins": [
       "expo-router",
-      ["expo-secure-store", {"configureAndroidBackup": true, "faceIDPermission": "Autoriser BLACKSPOT YOU à sécuriser votre session."}],
-      ["expo-location", {"locationWhenInUsePermission": "Autoriser BLACKSPOT YOU à afficher les lieux proches de vous.", "isIosBackgroundLocationEnabled": false, "isAndroidBackgroundLocationEnabled": false, "isAndroidForegroundServiceEnabled": false}],
+      [
+        "expo-secure-store",
+        {
+          "configureAndroidBackup": true
+        }
+      ],
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "BLACKSPOT YOU utilise votre position pour afficher les lieux à proximité."
+        }
+      ],
       "react-native-maps"
     ],
-    "experiments": {"typedRoutes": true},
     "extra": {
       "eas": {
         "projectId": "fbd1b684-c8fe-49be-adfa-790e87d521e3"

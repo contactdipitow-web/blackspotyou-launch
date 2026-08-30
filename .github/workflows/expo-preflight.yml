@@ -1,4 +1,4 @@
-name: Expo repository preflight
+name: Expo preflight
 
 on:
   push:
@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   validate:
@@ -14,20 +14,18 @@ jobs:
     timeout-minutes: 20
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Setup Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: 22
 
       - name: Install dependencies
         run: npm install --no-audit --no-fund
 
-      - name: Show resolved native versions
-        run: |
-          node -e "for (const p of ['expo','expo-modules-core','react-native','react-native-worklets','react-native-reanimated','expo-router','react-native-screens']) { try { console.log(p, require(p + '/package.json').version) } catch (e) { console.log(p, 'NOT_INSTALLED') } }"
-          npm ls expo expo-modules-core react-native react-native-worklets react-native-reanimated expo-router react-native-screens || true
+      - name: Resolve Expo config
+        run: npx expo config --type public >/dev/null
 
       - name: Expo Doctor
         run: npx expo-doctor
@@ -37,3 +35,16 @@ jobs:
 
       - name: Generate native iOS project
         run: npx expo prebuild --platform ios --clean --no-install
+
+      - name: Commit npm lockfile
+        shell: bash
+        run: |
+          set -euo pipefail
+          if git diff --quiet -- package-lock.json && git ls-files --error-unmatch package-lock.json >/dev/null 2>&1; then
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add package-lock.json
+          git commit -m "chore: lock Expo dependencies"
+          git push
