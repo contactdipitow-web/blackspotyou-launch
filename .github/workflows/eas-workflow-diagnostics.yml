@@ -9,20 +9,24 @@ jobs:
   inspect:
     runs-on: ubuntu-latest
     steps:
-      - name: Query completed TestFlight workflow state
+      - uses: actions/checkout@v5
+        with:
+          ref: main
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: npm
+      - name: Install project dependencies
+        run: npm ci --no-audit --no-fund
+      - name: Pull current App Store metadata
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+        run: npx --yes eas-cli@latest metadata:pull --profile production --non-interactive
+      - name: Show pulled store config
         run: |
-          node <<'NODE'
-          const token = process.env.EXPO_TOKEN;
-          if (!token) throw new Error('EXPO_TOKEN missing');
-          const query = `query WorkflowRunById($workflowRunId: ID!) { workflowRuns { byId(workflowRunId: $workflowRunId) { id status jobs { id key name status errors { title message } outputs } } } }`;
-          const response = await fetch('https://api.expo.dev/graphql', {
-            method: 'POST',
-            headers: { 'content-type': 'application/json', authorization: `Bearer ${token}` },
-            body: JSON.stringify({ query, variables: { workflowRunId: '01a05401-7045-7ba8-9906-205b4a1c769b' } }),
-          });
-          const json = await response.json();
-          if (!response.ok || json.errors) throw new Error(JSON.stringify(json.errors || json));
-          console.log(JSON.stringify(json.data.workflowRuns.byId, null, 2));
-          NODE
+          if [ -f store.config.json ]; then
+            cat store.config.json
+          else
+            echo "::error::store.config.json was not generated"
+            exit 1
+          fi
