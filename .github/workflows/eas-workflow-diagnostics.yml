@@ -24,3 +24,5 @@ jobs:
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
         run: npx --yes eas-cli@latest workflow:logs 01a05401-7236-7dbf-baf9-8f94c6a111ce --json --non-interactive --all-steps
+      - name: Snapshot marker
+        run: echo "Refreshed TestFlight state after App Store Connect upload began."
