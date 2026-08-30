@@ -1,0 +1,14 @@
+name: BLACKSPOT YOU iOS Preview
+
+on:
+  push:
+    branches:
+      - eas/ios-preview-v1.1.0
+
+jobs:
+  build_ios_preview:
+    name: Build iOS Preview
+    type: build
+    params:
+      platform: ios
+      profile: preview
