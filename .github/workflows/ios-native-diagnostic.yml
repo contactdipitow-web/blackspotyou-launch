@@ -1,6 +1,8 @@
 name: iOS native build diagnostic
 
 on:
+  push:
+    branches: [main]
   workflow_dispatch:
 
 permissions:
@@ -26,6 +28,11 @@ jobs:
 
       - name: Install JavaScript dependencies
         run: npm install --no-audit --no-fund
+
+      - name: Verify native dependency compatibility
+        run: |
+          node -e "const expected={expo:'57.0.18','expo-modules-core':'57.0.14','react-native':'0.86.3','react-native-reanimated':'4.5.1','react-native-worklets':'0.10.1'}; for(const [p,v] of Object.entries(expected)){const actual=require(p+'/package.json').version; console.log(p,actual); if(actual!==v){throw new Error(p+' expected '+v+' but resolved '+actual)}}"
+          npm ls expo expo-modules-core react-native react-native-reanimated react-native-worklets
 
       - name: Show Apple toolchain
         run: |
