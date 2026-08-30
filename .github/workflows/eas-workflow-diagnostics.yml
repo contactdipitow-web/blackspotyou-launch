@@ -13,24 +13,57 @@ jobs:
       - uses: actions/setup-node@v6
         with:
           node-version: 22
-          cache: npm
-      - name: Install project dependencies
-        run: npm ci --no-audit --no-fund
-      - name: Check Expo token availability
+      - name: Discover stored ASC keys and matching app
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
         run: |
-          if [ -z "$EXPO_TOKEN" ]; then
-            echo "::error::EXPO_TOKEN repository secret is not configured."
-            exit 1
-          fi
-          echo "EXPO_TOKEN is configured."
-      - name: Connect App Store Connect app by bundle id
-        env:
-          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
-          EXPO_DEBUG: "1"
-        run: npx --yes eas-cli@latest integrations:asc:connect --bundle-id com.blackspotyou.app --json --non-interactive
-      - name: Confirm App Store Connect integration
-        env:
-          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
-        run: npx --yes eas-cli@latest integrations:asc:status --json --non-interactive
+          node <<'NODE'
+          const endpoint = 'https://api.expo.dev/graphql';
+          const token = process.env.EXPO_TOKEN;
+          if (!token) throw new Error('EXPO_TOKEN missing');
+          async function gql(query, variables) {
+            const r = await fetch(endpoint, {
+              method: 'POST',
+              headers: {
+                'content-type': 'application/json',
+                authorization: `Bearer ${token}`,
+              },
+              body: JSON.stringify({ query, variables }),
+            });
+            const j = await r.json();
+            if (!r.ok || j.errors) throw new Error(JSON.stringify(j.errors || j));
+            return j.data;
+          }
+          const keysData = await gql(`
+            query Keys($accountName: String!) {
+              account {
+                byName(accountName: $accountName) {
+                  appStoreConnectApiKeysPaginated(first: 50) {
+                    edges { node { id keyIdentifier issuerIdentifier name roles } }
+                  }
+                }
+              }
+            }
+          `, { accountName: 'blinkydating' });
+          const keys = keysData.account.byName.appStoreConnectApiKeysPaginated.edges.map(e => e.node);
+          console.log('ASC_KEYS=' + JSON.stringify(keys.map(k => ({ id: k.id, keyIdentifier: k.keyIdentifier, name: k.name, roles: k.roles }))));
+          for (const key of keys) {
+            try {
+              const appData = await gql(`
+                query Apps($id: ID!, $bundle: String) {
+                  appStoreConnectApiKey {
+                    byId(id: $id) {
+                      remoteAppStoreConnectApps(bundleIdentifier: $bundle) {
+                        ascAppIdentifier bundleIdentifier name
+                      }
+                    }
+                  }
+                }
+              `, { id: key.id, bundle: 'com.blackspotyou.app' });
+              const apps = appData.appStoreConnectApiKey.byId?.remoteAppStoreConnectApps || [];
+              console.log('MATCH=' + JSON.stringify({ keyIdentifier: key.keyIdentifier, apps }));
+            } catch (e) {
+              console.log('MATCH_ERROR=' + JSON.stringify({ keyIdentifier: key.keyIdentifier, message: String(e.message || e) }));
+            }
+          }
+          NODE
