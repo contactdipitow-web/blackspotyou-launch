@@ -9,6 +9,9 @@ jobs:
   testflight:
     name: Upload BLACKSPOT YOU 1.1.0 (7) to TestFlight
     type: testflight
+    environment: production
+    env:
+      EXPO_DEBUG: "1"
     params:
       build_id: 92b67a82-aab2-4cbf-b611-f04e689b4045
       profile: production
