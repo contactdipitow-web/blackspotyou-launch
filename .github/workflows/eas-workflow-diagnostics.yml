@@ -26,12 +26,10 @@ jobs:
           fi
           echo "EXPO_TOKEN is configured."
       - name: Inspect failed EAS workflow
-        if: success()
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
         run: npx --yes eas-cli@latest workflow:view 01a053c7-5d82-7399-a93f-3839c3a7ac68 --json --non-interactive
-      - name: Read failed EAS workflow logs
-        if: success()
+      - name: Read failed EAS build job logs
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
-        run: npx --yes eas-cli@latest workflow:logs 01a053c7-5d82-7399-a93f-3839c3a7ac68 --json --non-interactive --all-steps
+        run: npx --yes eas-cli@latest workflow:logs 01a053c7-604e-7474-b436-362b6fd02134 --json --non-interactive --all-steps
