@@ -1,0 +1,14 @@
+name: BLACKSPOT YOU iOS Production
+
+on:
+  push:
+    branches:
+      - eas/ios-production-v1.1.0
+
+jobs:
+  build_ios_production:
+    name: Build iOS Production
+    type: build
+    params:
+      platform: ios
+      profile: production
