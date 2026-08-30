@@ -8,7 +8,7 @@ import { listPlaces } from '@/services/places';
 import { colors, radius, shadow } from '@/theme';
 import type { Establishment } from '@/types';
 
-const HERO = 'https://images.pexels.com/photos/17436052/pexels-photo-17436052.jpeg?auto=compress&cs=tinysrgb&w=1200';
+const HERO = 'https://images.pexels.com/photos/34592097/pexels-photo-34592097.jpeg?auto=compress&cs=tinysrgb&w=1400';
 
 export default function Home(){
   const [places,setPlaces]=useState<Establishment[]>([]);
@@ -21,7 +21,7 @@ export default function Home(){
     keyExtractor={p=>p.id}
     ListHeaderComponent={<View style={s.header}>
       <BrandHeader/>
-      <ImageBackground source={{uri:HERO}} style={s.hero} imageStyle={s.heroImage} accessibilityLabel="Deux amis souriants dans Paris">
+      <ImageBackground source={{uri:HERO}} style={s.hero} imageStyle={s.heroImage} accessibilityLabel="Jeunes amis noirs réunis à Paris">
         <View style={s.heroShade}/><ParisWatermark dark/>
         <View style={s.heroContent}>
           <Eyebrow inverse>PARIS · PAR NOUS, POUR NOUS</Eyebrow>
