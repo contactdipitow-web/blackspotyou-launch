@@ -25,11 +25,11 @@ jobs:
             exit 1
           fi
           echo "EXPO_TOKEN is configured."
-      - name: Inspect EAS TestFlight workflow
+      - name: Inspect EAS TestFlight workflow final state
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
         run: npx --yes eas-cli@latest workflow:view 01a053f9-ea7e-7d45-8bfa-6e401837415e --json --non-interactive
-      - name: Read EAS TestFlight job logs
+      - name: Read final EAS TestFlight job logs
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
         run: npx --yes eas-cli@latest workflow:logs 01a053f9-ec4b-700d-a665-391092621e0b --json --non-interactive --all-steps
