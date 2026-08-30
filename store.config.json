@@ -1,0 +1,27 @@
+{
+  "configVersion": 0,
+  "apple": {
+    "info": {
+      "fr-FR": {
+        "title": "BLACKSPOT YOU",
+        "subtitle": "Adresses black friendly",
+        "description": "BLACKSPOT YOU est un annuaire communautaire pour découvrir à Paris des lieux, commerces, restaurants, services et expériences recommandés par et pour la communauté noire.\n\nExplorez les adresses autour de vous, consultez la carte, enregistrez vos favoris et proposez de nouveaux lieux. Partagez vos expériences et contribuez à une carte plus utile, plus humaine et plus vivante.\n\nRetrouvez également les contenus À la une, les favoris et partenaires de BLACKSPOT YOU, ainsi que les B-coins : contribuez à la communauté, gagnez des B-coins et suivez votre solde directement dans l’application.\n\nBLACKSPOT YOU intègre aussi des outils de signalement, de modération et d’administration pour accompagner les contributions de la communauté.",
+        "keywords": [
+          "black friendly",
+          "Paris",
+          "adresses",
+          "restaurants",
+          "communauté noire",
+          "annuaire",
+          "sorties",
+          "lieux"
+        ],
+        "releaseNotes": "Nouvelle expérience mobile BLACKSPOT YOU : Explorer multi-catégories, carte et lieux à proximité, contenus À la une, B-coins, favoris, propositions de lieux et outils de modération intégrés.",
+        "promoText": "Découvrez des lieux black friendly à Paris, contribuez à la communauté et retrouvez les adresses qui comptent autour de vous.",
+        "marketingUrl": "https://blackspotyou.com",
+        "supportUrl": "https://blackspotyou.com/contact",
+        "privacyPolicyUrl": "https://blackspotyou.com/confidentialite"
+      }
+    }
+  }
+}
