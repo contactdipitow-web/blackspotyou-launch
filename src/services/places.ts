@@ -1,12 +1,12 @@
 import { supabase } from '@/lib/supabase';
 import type { Category, Establishment } from '@/types';
 
-const fields = 'id,name,slug,description,address_line,postal_code,city,country_code,latitude,longitude,google_place_id,cover_image_path,website_url,phone,public_status,ownership_context,community_context,created_at,establishment_categories(label,slug)';
+const fields = 'id,name,slug,category_id,description,address_line,postal_code,city,country_code,latitude,longitude,google_place_id,cover_image_path,website_url,phone,public_status,ownership_context,community_context,created_at,establishment_categories(label,slug)';
 
-export async function listPlaces({ query = '', category, from = 0, limit = 20 }: { query?: string; category?: string; from?: number; limit?: number } = {}) {
+export async function listPlaces({ query = '', categoryIds = [], from = 0, limit = 20 }: { query?: string; categoryIds?: number[]; from?: number; limit?: number } = {}) {
   let request = supabase.from('establishments').select(fields).eq('publish_status', 'published').order('created_at', { ascending: false }).range(from, from + limit - 1);
   if (query.trim()) request = request.or(`name.ilike.%${query.trim()}%,city.ilike.%${query.trim()}%,address_line.ilike.%${query.trim()}%`);
-  if (category) request = request.eq('establishment_categories.slug', category);
+  if (categoryIds.length) request = request.in('category_id', categoryIds);
   const { data, error } = await request;
   if (error) throw error;
   return (data ?? []) as unknown as Establishment[];
