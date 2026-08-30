@@ -99,8 +99,7 @@ const ihdr = Buffer.alloc(13);
 ihdr.writeUInt32BE(WIDTH, 0);
 ihdr.writeUInt32BE(HEIGHT, 4);
 ihdr[8] = 8; // bit depth
-hdrColorType = 2;
-ihdr[9] = hdrColorType; // truecolor RGB
+ihdr[9] = 2; // truecolor RGB
 // compression/filter/interlace remain 0
 
 const png = Buffer.concat([
