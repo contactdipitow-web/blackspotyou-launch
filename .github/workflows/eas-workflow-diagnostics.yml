@@ -9,7 +9,7 @@ jobs:
   inspect:
     runs-on: ubuntu-latest
     steps:
-      - name: Query current TestFlight workflow state
+      - name: Query completed TestFlight workflow state
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
         run: |
