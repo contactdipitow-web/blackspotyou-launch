@@ -11,22 +11,14 @@ jobs:
     steps:
       - uses: actions/checkout@v5
         with:
-          ref: main
+          ref: release/app-store-metadata-v1.1.0
       - uses: actions/setup-node@v6
         with:
           node-version: 22
           cache: npm
       - name: Install project dependencies
         run: npm ci --no-audit --no-fund
-      - name: Pull current App Store metadata
+      - name: Lint App Store metadata
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
-        run: npx --yes eas-cli@latest metadata:pull --profile production --non-interactive
-      - name: Show pulled store config
-        run: |
-          if [ -f store.config.json ]; then
-            cat store.config.json
-          else
-            echo "::error::store.config.json was not generated"
-            exit 1
-          fi
+        run: npx --yes eas-cli@latest metadata:lint --profile production --json
