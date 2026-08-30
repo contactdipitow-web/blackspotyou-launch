@@ -1,92 +1,23 @@
 import { router } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { Alert, FlatList, Linking, StyleSheet, Text, View } from 'react-native';
+import { Alert, FlatList, Linking, Pressable, StyleSheet, Text, View } from 'react-native';
+import { BrandHeader } from '@/components/BrandHeader';
 import { PlaceCard } from '@/components/PlaceCard';
 import { Button, Loading, Title } from '@/components/ui';
 import { useAuth } from '@/contexts/AuthContext';
 import { deleteAccount, listFavorites } from '@/services/account';
-import { colors } from '@/theme';
+import { getBCoinWallet } from '@/services/bcoins';
+import { colors, radius, shadow } from '@/theme';
 import type { Establishment } from '@/types';
 
 const webUrl = process.env.EXPO_PUBLIC_WEB_URL ?? 'https://blackspotyou.com';
-
-function LegalLinks() {
-  return (
-    <View style={styles.legal}>
-      <Button title="Confidentialité" variant="secondary" onPress={() => void Linking.openURL(`${webUrl}/confidentialite`)} />
-      <Button title="Conditions d’utilisation" variant="secondary" onPress={() => void Linking.openURL(`${webUrl}/conditions`)} />
-      <Button title="Contacter BLACKSPOT YOU" variant="secondary" onPress={() => void Linking.openURL(`${webUrl}/contact`)} />
-    </View>
-  );
-}
-
+function LegalLinks() { return <View style={styles.legal}><Button title="Confidentialité" variant="secondary" onPress={() => void Linking.openURL(`${webUrl}/confidentialite`)} /><Button title="Conditions d’utilisation" variant="secondary" onPress={() => void Linking.openURL(`${webUrl}/conditions`)} /><Button title="Contacter BLACKSPOT YOU" variant="secondary" onPress={() => void Linking.openURL(`${webUrl}/contact`)} /></View>; }
 export default function Profile() {
-  const { user, role, loading, signOut } = useAuth();
-  const [favorites, setFavorites] = useState<Establishment[]>([]);
-  const [deleting, setDeleting] = useState(false);
-  useEffect(() => { if (user) void listFavorites(user.id).then(setFavorites); }, [user]);
-  if (loading) return <Loading />;
-
-  if (!user) {
-    return (
-      <View style={styles.page}>
-        <Title>Votre espace</Title>
-        <Text style={styles.copy}>Connectez-vous pour proposer des lieux, contribuer et retrouver vos favoris.</Text>
-        <Button title="Se connecter" onPress={() => router.push('/auth')} />
-        <LegalLinks />
-      </View>
-    );
-  }
-
-  const performDeletion = async () => {
-    setDeleting(true);
-    try {
-      await deleteAccount();
-      Alert.alert('Compte supprimé', 'Votre compte et vos données personnelles ont été supprimés.');
-      router.replace('/');
-    } catch (error) {
-      const message = error instanceof Error && error.message === 'admin_transfer_required'
-        ? 'Le compte administrateur doit d’abord transférer ses responsabilités. Contactez le support.'
-        : 'La suppression n’a pas pu aboutir. Contactez le support depuis cette page.';
-      Alert.alert('Suppression impossible', message);
-    } finally {
-      setDeleting(false);
-    }
-  };
-
-  const confirmDeletion = () => {
-    Alert.alert(
-      'Supprimer définitivement le compte ?',
-      'Vos favoris, signalements, contributions et données personnelles seront supprimés. Cette action est irréversible.',
-      [
-        { text: 'Annuler', style: 'cancel' },
-        { text: 'Supprimer définitivement', style: 'destructive', onPress: () => Alert.alert('Dernière confirmation', 'Confirmez la suppression définitive de votre compte BLACKSPOT YOU.', [{ text: 'Annuler', style: 'cancel' }, { text: 'Oui, supprimer', style: 'destructive', onPress: () => void performDeletion() }]) },
-      ],
-    );
-  };
-
-  return (
-    <FlatList
-      style={styles.page}
-      contentContainerStyle={styles.content}
-      data={favorites}
-      keyExtractor={(place) => place.id}
-      renderItem={({ item }) => <PlaceCard place={item} />}
-      ListHeaderComponent={<View style={styles.header}><Title>Bonjour</Title><Text style={styles.email}>{user.email}</Text><Text style={styles.role}>Rôle : {role === 'member' ? 'utilisateur' : role}</Text><Button title="Proposer un lieu" onPress={() => router.push('/propose')} /><Button title="Se déconnecter" variant="secondary" onPress={() => void signOut()} /><Text style={styles.section}>Mes favoris</Text></View>}
-      ListEmptyComponent={<Text style={styles.copy}>Vous n’avez pas encore de favori.</Text>}
-      ListFooterComponent={<View style={styles.footer}><Text style={styles.section}>Informations et compte</Text><LegalLinks /><Button title={deleting ? 'Suppression…' : 'Supprimer définitivement mon compte'} variant="danger" disabled={deleting} onPress={confirmDeletion} /></View>}
-    />
-  );
+  const { user, role, loading, signOut } = useAuth(); const [favorites, setFavorites] = useState<Establishment[]>([]); const [deleting, setDeleting] = useState(false); const [coins,setCoins]=useState(0);
+  useEffect(() => { if (user) { void listFavorites(user.id).then(setFavorites); void getBCoinWallet(user.id).then(w=>setCoins(w.balance)); } }, [user]); if (loading) return <Loading />;
+  if (!user) return <View style={styles.page}><BrandHeader/><Title>Votre espace BLACKSPOT YOU</Title><Text style={styles.copy}>Connectez-vous pour proposer des lieux, contribuer, gagner des B-coins et retrouver vos favoris.</Text><Button title="Se connecter" onPress={() => router.push('/auth')} /><LegalLinks /></View>;
+  const performDeletion = async () => { setDeleting(true); try { await deleteAccount(); Alert.alert('Compte supprimé', 'Votre compte et vos données personnelles ont été supprimés.'); router.replace('/'); } catch (error) { const message = error instanceof Error && error.message === 'admin_transfer_required' ? 'Le compte administrateur doit d’abord transférer ses responsabilités. Contactez le support.' : 'La suppression n’a pas pu aboutir. Contactez le support depuis cette page.'; Alert.alert('Suppression impossible', message); } finally { setDeleting(false); } };
+  const confirmDeletion = () => Alert.alert('Supprimer définitivement le compte ?', 'Vos favoris, signalements, contributions et données personnelles seront supprimés. Cette action est irréversible.', [{ text: 'Annuler', style: 'cancel' }, { text: 'Supprimer définitivement', style: 'destructive', onPress: () => Alert.alert('Dernière confirmation', 'Confirmez la suppression définitive de votre compte BLACKSPOT YOU.', [{ text: 'Annuler', style: 'cancel' }, { text: 'Oui, supprimer', style: 'destructive', onPress: () => void performDeletion() }]) }]);
+  return <FlatList style={styles.pageList} contentContainerStyle={styles.content} data={favorites} keyExtractor={(place) => place.id} renderItem={({ item }) => <PlaceCard place={item} />} ListHeaderComponent={<View style={styles.header}><BrandHeader/><View><Title>Bonjour.</Title><Text style={styles.email}>{user.email}</Text><Text style={styles.role}>Compte {role === 'member' ? 'utilisateur' : role}</Text></View><Pressable style={styles.coinCard} onPress={()=>router.push('/bcoins')}><View><Text style={styles.coinLabel}>MON SOLDE</Text><Text style={styles.coinBalance}>{coins} B-coins</Text></View><Text style={styles.coinArrow}>→</Text></Pressable>{role!=='member'?<Pressable style={styles.adminCard} onPress={()=>router.push('/admin')}><View><Text style={styles.adminTag}>{role==='admin'?'ADMINISTRATION':'MODÉRATION'}</Text><Text style={styles.adminTitle}>Gérer BLACKSPOT YOU depuis l’app</Text><Text style={styles.adminCopy}>Lieux, contributions, signalements{role==='admin'?', utilisateurs et rôles':''}.</Text></View><Text style={styles.adminArrow}>→</Text></Pressable>:null}<Button title="Proposer un lieu" onPress={() => router.push('/propose')} /><Button title="Se déconnecter" variant="secondary" onPress={() => void signOut()} /><Text style={styles.section}>Mes favoris</Text></View>} ListEmptyComponent={<Text style={styles.copy}>Vous n’avez pas encore de favori.</Text>} ListFooterComponent={<View style={styles.footer}><Text style={styles.section}>Informations et compte</Text><LegalLinks /><Button title={deleting ? 'Suppression…' : 'Supprimer définitivement mon compte'} variant="danger" disabled={deleting} onPress={confirmDeletion} /></View>} />;
 }
-
-const styles = StyleSheet.create({
-  page: { flex: 1, backgroundColor: colors.canvas, paddingTop: 64, paddingHorizontal: 20 },
-  content: { paddingBottom: 120 },
-  header: { gap: 9 },
-  copy: { color: colors.muted, fontSize: 16, lineHeight: 24, marginVertical: 18 },
-  email: { fontSize: 16, color: colors.ink },
-  role: { color: colors.purpleDark, fontWeight: '700' },
-  section: { fontWeight: '900', fontSize: 13, letterSpacing: 1.2, marginTop: 20, color: colors.ink },
-  legal: { marginTop: 10 },
-  footer: { marginTop: 24, paddingTop: 8, gap: 4 },
-});
+const styles = StyleSheet.create({page:{flex:1,backgroundColor:colors.canvas,paddingTop:58,paddingHorizontal:20},pageList:{flex:1,backgroundColor:colors.canvas},content:{padding:20,paddingTop:58,paddingBottom:120},header:{gap:12},copy:{color:colors.muted,fontSize:15,lineHeight:22,marginVertical:12},email:{fontSize:14,color:colors.muted,marginTop:6},role:{color:colors.purpleDark,fontWeight:'800',fontSize:12,marginTop:4,textTransform:'uppercase'},coinCard:{backgroundColor:colors.black,borderRadius:radius.lg,padding:17,flexDirection:'row',alignItems:'center',justifyContent:'space-between',...shadow},coinLabel:{color:'#C4A7FF',fontSize:10,fontWeight:'900',letterSpacing:1.2},coinBalance:{color:colors.white,fontSize:25,fontWeight:'950',marginTop:4},coinArrow:{color:colors.white,fontSize:26},adminCard:{backgroundColor:colors.lilac,borderRadius:radius.lg,padding:17,flexDirection:'row',alignItems:'center',justifyContent:'space-between',gap:10},adminTag:{fontSize:10,color:colors.purpleDark,fontWeight:'950',letterSpacing:1.1},adminTitle:{fontSize:17,fontWeight:'900',color:colors.ink,marginTop:4},adminCopy:{fontSize:12,color:colors.muted,marginTop:4,maxWidth:270},adminArrow:{fontSize:26,color:colors.purpleDark},section:{fontWeight:'950',fontSize:12,letterSpacing:1.2,marginTop:14,color:colors.ink,textTransform:'uppercase'},legal:{marginTop:8},footer:{marginTop:24,paddingTop:8,gap:4}});

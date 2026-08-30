@@ -3,19 +3,27 @@
     "name": "BLACKSPOT YOU",
     "slug": "blackspot-you",
     "owner": "blinkydating",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "orientation": "portrait",
     "scheme": "blackspotyou",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
     "ios": {
       "bundleIdentifier": "com.blackspotyou.app",
-      "buildNumber": "1",
+      "buildNumber": "2",
       "supportsTablet": false,
+      "icon": "./assets/icon.png",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
       }
     },
     "android": {
-      "package": "com.blackspotyou.app"
+      "package": "com.blackspotyou.app",
+      "versionCode": 2,
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/icon.png",
+        "backgroundColor": "#18131F"
+      }
     },
     "plugins": [
       "expo-router",
@@ -28,7 +36,7 @@
       [
         "expo-location",
         {
-          "locationWhenInUsePermission": "BLACKSPOT YOU utilise votre position pour afficher les lieux à proximité."
+          "locationWhenInUsePermission": "BLACKSPOT YOU utilise votre position pour afficher précisément les lieux situés dans un rayon de 500 mètres autour de vous."
         }
       ],
       "react-native-maps"

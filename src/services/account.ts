@@ -1,12 +1,13 @@
 import { supabase } from '@/lib/supabase';
 import type { AppRole, Establishment } from '@/types';
 
+const favoriteFields = 'establishments(id,name,slug,category_id,description,address_line,postal_code,city,country_code,latitude,longitude,google_place_id,cover_image_path,website_url,phone,public_status,ownership_context,community_context,created_at,establishment_categories(label,slug))';
 export async function getRole(userId: string): Promise<AppRole> {
   const { data } = await supabase.from('user_roles').select('role').eq('user_id', userId).maybeSingle();
   return (data?.role as AppRole | undefined) ?? 'member';
 }
 export async function listFavorites(userId: string) {
-  const { data, error } = await supabase.from('favorites').select('establishments(id,name,slug,city,public_status,cover_image_path)').eq('user_id', userId);
+  const { data, error } = await supabase.from('favorites').select(favoriteFields).eq('user_id', userId);
   if (error) throw error;
   return (data ?? []).map((row: any) => row.establishments).filter(Boolean) as Establishment[];
 }
