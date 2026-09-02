@@ -3,14 +3,14 @@
     "name": "BLACKSPOT YOU",
     "slug": "blackspot-you",
     "owner": "blinkydating",
-    "version": "1.1.0",
+    "version": "1.2.0",
     "orientation": "portrait",
     "scheme": "blackspotyou",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
     "ios": {
       "bundleIdentifier": "com.blackspotyou.app",
-      "buildNumber": "2",
+      "buildNumber": "3",
       "supportsTablet": false,
       "icon": "./assets/icon.png",
       "infoPlist": {
@@ -19,7 +19,7 @@
     },
     "android": {
       "package": "com.blackspotyou.app",
-      "versionCode": 2,
+      "versionCode": 3,
       "adaptiveIcon": {
         "foregroundImage": "./assets/icon.png",
         "backgroundColor": "#18131F"
