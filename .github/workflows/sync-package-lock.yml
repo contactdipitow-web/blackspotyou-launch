@@ -1,3 +1,4 @@
+# Expo SDK 57 lockfile aligned; this commit retriggers iOS validation on the committed lock.
 name: Sync package lock
 
 on:
