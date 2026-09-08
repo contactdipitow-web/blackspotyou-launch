@@ -67,3 +67,5 @@ jobs:
 
       - name: Build and submit to App Store Connect
         run: eas build --platform ios --profile production --non-interactive --auto-submit --wait
+
+# release-trigger: 2026-09-08
