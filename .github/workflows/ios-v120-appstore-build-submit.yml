@@ -1,0 +1,69 @@
+name: BLACKSPOT YOU iOS 1.2.0 Build & App Store Submit
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - .github/workflows/ios-v120-appstore-build-submit.yml
+
+permissions:
+  contents: read
+
+concurrency:
+  group: blackspot-ios-v120-appstore-submit
+  cancel-in-progress: false
+
+jobs:
+  build-submit-ios:
+    name: Build and submit BLACKSPOT YOU 1.2.0
+    runs-on: ubuntu-24.04
+    timeout-minutes: 75
+    env:
+      EXPO_TOKEN_PRIMARY: ${{ secrets.EXPO_TOKEN }}
+      EXPO_TOKEN_EAS: ${{ secrets.EAS_TOKEN }}
+      EXPO_TOKEN_ACCESS: ${{ secrets.EXPO_ACCESS_TOKEN }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Resolve Expo token
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ -n "${EXPO_TOKEN_PRIMARY:-}" ]; then
+            echo "EXPO_TOKEN=$EXPO_TOKEN_PRIMARY" >> "$GITHUB_ENV"
+          elif [ -n "${EXPO_TOKEN_EAS:-}" ]; then
+            echo "EXPO_TOKEN=$EXPO_TOKEN_EAS" >> "$GITHUB_ENV"
+          elif [ -n "${EXPO_TOKEN_ACCESS:-}" ]; then
+            echo "EXPO_TOKEN=$EXPO_TOKEN_ACCESS" >> "$GITHUB_ENV"
+          else
+            echo "::error::No Expo access token is configured in repository secrets."
+            exit 2
+          fi
+
+      - name: Install EAS CLI
+        run: npm install --global eas-cli@latest
+
+      - name: Validate release identity
+        run: |
+          node - <<'NODE'
+          const app = require('./app.json').expo;
+          if (app.name !== 'BLACKSPOT YOU') throw new Error(`Unexpected app name: ${app.name}`);
+          if (app.version !== '1.2.0') throw new Error(`Unexpected version: ${app.version}`);
+          if (app.ios?.bundleIdentifier !== 'com.blackspotyou.app') throw new Error(`Unexpected bundle: ${app.ios?.bundleIdentifier}`);
+          if (app.extra?.eas?.projectId !== 'fbd1b684-c8fe-49be-adfa-790e87d521e3') throw new Error(`Unexpected EAS project: ${app.extra?.eas?.projectId}`);
+          NODE
+
+      - name: Check Expo identity
+        run: eas whoami
+
+      - name: Build and submit to App Store Connect
+        run: eas build --platform ios --profile production --non-interactive --auto-submit --wait
