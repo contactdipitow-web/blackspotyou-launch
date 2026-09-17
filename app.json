@@ -36,7 +36,7 @@
       [
         "expo-location",
         {
-          "locationWhenInUsePermission": "BLACKSPOT YOU utilise votre position pour afficher précisément les lieux situés dans un rayon de 500 mètres autour de vous."
+          "locationWhenInUsePermission": "BLACKSPOT YOU utilise votre position pour afficher les lieux dans le rayon que vous choisissez, de 100 mètres à 2 kilomètres."
         }
       ],
       "react-native-maps"

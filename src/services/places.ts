@@ -24,6 +24,19 @@ export async function listCategories() {
   return (data ?? []) as Category[];
 }
 
+export async function listEditorialSelection(partnerName: string) {
+  const { data, error } = await supabase
+    .from('spotlight_items')
+    .select(`sort_order,establishments(${fields})`)
+    .eq('is_published', true)
+    .eq('partner_name', partnerName)
+    .order('sort_order', { ascending: true });
+  if (error) throw error;
+  return (data ?? [])
+    .map((row: any) => row.establishments)
+    .filter(Boolean) as Establishment[];
+}
+
 export type PlaceProposal = Pick<Establishment,'name'|'address_line'|'postal_code'|'city'|'country_code'|'latitude'|'longitude'> & {
   category_id: number; description?: string; experience_type: 'positive'|'mixed'|'negative'|'incident'|'update';
   visit_date: string; title?: string; body: string; is_anonymous: boolean; contact_consent: boolean;

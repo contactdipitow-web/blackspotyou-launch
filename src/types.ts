@@ -39,7 +39,10 @@ export type SpotlightItem = {
   is_sponsored: boolean;
   sort_order: number;
   published_at: string | null;
-  establishments: Pick<Establishment, 'id'|'name'|'slug'|'city'|'cover_image_path'> | null;
+  establishments: Pick<
+    Establishment,
+    'id'|'name'|'slug'|'address_line'|'postal_code'|'city'|'latitude'|'longitude'|'google_place_id'|'cover_image_path'
+  > | null;
 };
 
 export type BCoinWallet = { user_id: string; balance: number; lifetime_earned: number; updated_at: string };
